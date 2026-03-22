@@ -1,0 +1,121 @@
+INFO:livekit.agents:starting worker
+{"message": "starting worker", "level": "INFO", "name": "livekit.agents", "version": "1.5.0", "rtc-version": "1.0.25", "timestamp": "2026-03-22T18:50:36.493575+00:00"}
+ERROR:livekit.agents:worker failed
+Traceback (most recent call last):
+  File "C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\site-packages\livekit\agents\cli\cli.py", line 1603, in _worker_run
+    await server.run(devmode=args.devmode, unregistered=jupyter)
+  File "C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\site-packages\livekit\agents\worker.py", line 705, in run
+    await self._http_server.start()
+  File "C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\site-packages\livekit\agents\utils\http_server.py", line 29, in start
+    await site.start()
+  File "C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\web_runner.py", line 121, in start
+    self._server = await loop.create_server(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 1630, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8081): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted
+{"message": "worker failed", "level": "ERROR", "name": "livekit.agents", "exc_info": "Traceback (most recent call last):\n  File \"C:\\Users\\Divya\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\livekit\\agents\\cli\\cli.py\", line 1603, in _worker_run\n    await server.run(devmode=args.devmode, unregistered=jupyter)\n  File \"C:\\Users\\Divya\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\livekit\\agents\\worker.py\", line 705, in run\n    await self._http_server.start()\n  File \"C:\\Users\\Divya\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\livekit\\agents\\utils\\http_server.py\", line 29, in start\n    await site.start()\n  File \"C:\\Users\\Divya\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\aiohttp\\web_runner.py\", line 121, in start\n    self._server = await loop.create_server(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<7 lines>...\n    )\n    ^\n  File \"C:\\Users\\Divya\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\asyncio\\base_events.py\", line 1630, in create_server\n    raise OSError(err.errno, msg) from None\nOSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8081): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted", "timestamp": "2026-03-22T18:50:36.495060+00:00"}
+INFO:livekit.agents:draining worker
+{"message": "draining worker", "level": "INFO", "name": "livekit.agents", "id": "unregistered", "timeout": 1800, "timestamp": "2026-03-22T18:50:36.499127+00:00"}
+INFO:livekit.agents:shutting down worker
+{"message": "shutting down worker", "level": "INFO", "name": "livekit.agents", "id": "unregistered", "timestamp": "2026-03-22T18:50:36.499341+00:00"}
++--------------------- Traceback (most recent call last) ---------------------+
+| C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\site-packages\li |
+| vekit\agents\cli\cli.py:1772 in start                                       |
+|                                                                             |
+|   1769         if drain_timeout is not None:                                |
+|   1770             server.update_options(drain_timeout=drain_timeout)       |
+|   1771                                                                      |
+| > 1772         _run_worker(                                                 |
+|   1773             server=server,                                           |
+|   1774             args=proto.CliArgs(                                      |
+|   1775                 log_level=log_level.value,                           |
+|                                                                             |
+| +-------------------------------- locals ---------------------------------+ |
+| |       api_key = 'APIJdwG4GgRu8dV'                                       | |
+| |    api_secret = 'juUocPwoZ2ltwOjN8To4sopGZOeD8XnYdXRvyYUuDiU'           | |
+| | drain_timeout = None                                                    | |
+| |     log_level = <LogLevel.info: 'INFO'>                                 | |
+| |        server = <livekit.agents.worker.AgentServer object at            | |
+| |                 0x000001F3E3A29BE0>                                     | |
+| |           url = 'wss://interviewagent-4f7lhckq.livekit.cloud'           | |
+| +-------------------------------------------------------------------------+ |
+|                                                                             |
+| C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\site-packages\li |
+| vekit\agents\cli\cli.py:1627 in _run_worker                                 |
+|                                                                             |
+|   1624             if not args.devmode:                                     |
+|   1625                 loop.run_until_complete(server.drain())              |
+|   1626                                                                      |
+| > 1627             loop.run_until_complete(server.aclose())                 |
+|   1628                                                                      |
+|   1629             if watch_client:                                         |
+|   1630                 loop.run_until_complete(watch_client.aclose())       |
+|                                                                             |
+| +-------------------------------- locals ---------------------------------+ |
+| |           args = CliArgs(                                               | |
+| |                      log_level='INFO',                                  | |
+| |                      url='wss://interviewagent-4f7lhckq.livekit.cloud', | |
+| |                      api_key='APIJdwG4GgRu8dV',                         | |
+| |                      api_secret='juUocPwoZ2ltwOjN8To4sopGZOeD8XnYdXRvy… | |
+| |                      devmode=False,                                     | |
+| |                      reload=False,                                      | |
+| |                      reload_count=0,                                    | |
+| |                      mp_cch=None                                        | |
+| |                  )                                                      | |
+| |              c = None                                                   | |
+| | exit_triggered = False                                                  | |
+| |        jupyter = False                                                  | |
+| |           loop = <ProactorEventLoop running=False closed=True           | |
+| |                  debug=False>                                           | |
+| |      main_task = <Task finished name='worker_main_task_cli'             | |
+| |                  coro=<_run_worker.<locals>._worker_run() done, defined | |
+| |                  at                                                     | |
+| |                  C:\Users\Divya\AppData\Local\Programs\Python\Python31… | |
+| |                  result=None>                                           | |
+| |         server = <livekit.agents.worker.AgentServer object at           | |
+| |                  0x000001F3E3A29BE0>                                    | |
+| |            sig = <Signals.SIGTERM: 15>                                  | |
+| |          tasks = set()                                                  | |
+| |   watch_client = None                                                   | |
+| +-------------------------------------------------------------------------+ |
+|                                                                             |
+| C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_eve |
+| nts.py:725 in run_until_complete                                            |
+|                                                                             |
+|    722         if not future.done():                                        |
+|    723             raise RuntimeError('Event loop stopped before Future com |
+|    724                                                                      |
+| >  725         return future.result()                                       |
+|    726                                                                      |
+|    727     def stop(self):                                                  |
+|    728         """Stop running the event loop.                              |
+|                                                                             |
+| +-------------------------------- locals ---------------------------------+ |
+| |   future = <Task finished name='Task-3' coro=<AgentServer.aclose()      | |
+| |            done, defined at                                             | |
+| |            C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\… | |
+| |            exception=AssertionError()>                                  | |
+| | new_task = True                                                         | |
+| |     self = <ProactorEventLoop running=False closed=True debug=False>    | |
+| +-------------------------------------------------------------------------+ |
+|                                                                             |
+| C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\site-packages\li |
+| vekit\agents\worker.py:934 in aclose                                        |
+|                                                                             |
+|    931                                                                      |
+|    932             logger.info("shutting down worker", extra={"id": self.id |
+|    933                                                                      |
+| >  934             assert self._close_future is not None                    |
+|    935             assert self._http_session is not None                    |
+|    936             assert self._api is not None                             |
+|    937             assert self._http_server is not None                     |
+|                                                                             |
+| +-------------------------------- locals ---------------------------------+ |
+| | self = <livekit.agents.worker.AgentServer object at 0x000001F3E3A29BE0> | |
+| +-------------------------------------------------------------------------+ |
++-----------------------------------------------------------------------------+
+AssertionError
