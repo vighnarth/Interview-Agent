@@ -22,3 +22,4 @@ Thumbs.db
 # Test files
 test.wav
 test_ingestion.wav
+"agent.log" 

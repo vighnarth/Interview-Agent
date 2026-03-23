@@ -36,12 +36,90 @@ from agent.persona import build_system_prompt
 from livekit.plugins import cartesia, openai, silero
 from openai import AsyncOpenAI
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("agent.log", mode='w', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
+# Custom Free Fallback: Edge-TTS (No Key, Unlimited)
+# ---------------------------------------------------------------------------
+class EdgeTTS(tts.TTS):
+    def __init__(self, voice: str = "en-US-AvaMultilingualNeural"):
+        super().__init__(
+            capabilities=tts.TTSCapabilities(streaming=False),
+            sample_rate=48000,
+            num_channels=1
+        )
+        self._voice = voice
+
+    def synthesize(self, text: str) -> tts.SynthesizeStream:
+        return EdgeSynthesizeStream(tts=self, text=text, voice=self._voice)
+
+class EdgeSynthesizeStream(tts.SynthesizeStream):
+    def __init__(self, tts: tts.TTS, text: str, voice: str):
+        super().__init__(tts=tts, conn_options=DEFAULT_API_CONNECT_OPTIONS)
+        self._text = text
+        self._voice = voice
+
+    async def _run(self):
+        import io
+        import av
+        import edge_tts
+        from livekit import rtc
+        
+        try:
+            communicate = edge_tts.Communicate(self._text, self._voice)
+            mp3_buffer = io.BytesIO()
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    mp3_buffer.write(chunk["data"])
+            
+            mp3_buffer.seek(0)
+            if mp3_buffer.getbuffer().nbytes == 0:
+                return
+
+            container = av.open(mp3_buffer)
+            resampler = av.AudioResampler(format='s16', layout='mono', rate=48000)
+            
+            for frame in container.decode(audio=0):
+                for resampled_frame in resampler.resample(frame):
+                    self._event_ch.send_nowait(tts.SynthesizeEvent(
+                        type=tts.SynthesizeEventType.AUDIO,
+                        audio=rtc.AudioFrame(
+                            data=resampled_frame.to_ndarray().tobytes(),
+                            sample_rate=48000,
+                            num_channels=1,
+                            samples_per_channel=resampled_frame.samples
+                        )
+                    ))
+            
+            # Flush resampler
+            for resampled_frame in resampler.resample(None):
+                self._event_ch.send_nowait(tts.SynthesizeEvent(
+                    type=tts.SynthesizeEventType.AUDIO,
+                    audio=rtc.AudioFrame(
+                        data=resampled_frame.to_ndarray().tobytes(),
+                        sample_rate=48000,
+                        num_channels=1,
+                        samples_per_channel=resampled_frame.samples
+                    )
+                ))
+        except Exception as e:
+            logger.error(f"[EdgeTTS] Error synthesizing: {e}")
+        finally:
+            self._event_ch.send_nowait(tts.SynthesizeEvent(type=tts.SynthesizeEventType.FINISHED))
+
+
+# ---------------------------------------------------------------------------
 # Native Groq Client for official plugins
+# ---------------------------------------------------------------------------
 def get_groq_client():
     return AsyncOpenAI(
         base_url="https://api.groq.com/openai/v1",
@@ -59,14 +137,19 @@ async def entrypoint(ctx: JobContext):
 
     # Use a default friendly female voice if none is provided via env var
     cartesia_voice = os.getenv("CARTESIA_VOICE_ID", "248be419-c632-4f23-adf1-5324ed7dbf1d")
+    cartesia_dict = os.getenv("CARTESIA_DICT_ID") # Optional Pronunciation Dictionary
     
     client = get_groq_client()
     
-    # We use official plugins pointing to Groq for maximum stability
+    # Primary: Cartesia (Clone)
+    # Fallback: Edge-TTS (Free & Unlimited)
+    primary_tts = cartesia.TTS(voice=cartesia_voice, pronunciation_dict_id=cartesia_dict)
+    fallback_tts = EdgeTTS()
+
     session = AgentSession(
         stt=openai.STT(model="whisper-large-v3", client=client),
-        llm=openai.LLM(model="llama-3.3-70b-versatile", client=client),
-        tts=cartesia.TTS(voice=cartesia_voice),
+        llm=openai.LLM(model="llama-3.1-8b-instant", client=client),
+        tts=tts.FallbackAdapter([primary_tts, fallback_tts]),
         vad=silero.VAD.load(),
     )
 
@@ -76,24 +159,31 @@ async def entrypoint(ctx: JobContext):
     system_prompt = build_system_prompt(context)
 
     agent = Agent(
-        instructions=system_prompt + "\n\nCRITICAL: Keep answers concise (3 sentences). Be honest as Vighnarth."
+        instructions=system_prompt + "\n\nCRITICAL behavioral rules:"
+                                     "\n- Keep answers concise (max 3 sentences)."
+                                     "\n- Do NOT correct the interviewer if they mispronounce your name (Vighnarth)."
+                                     "\n- Be honest and professional as Vighnarth."
     )
 
     await session.start(agent, room=ctx.room)
 
     @ctx.room.on("data_received")
     def on_data_received(data_packet: rtc.DataPacket):
-        if data_packet.participant.identity == "interviewer":
-            try:
-                import json
-                data = json.loads(data_packet.data)
-                if data.get("type") == "question":
-                    text = data.get("text")
-                    logger.info(f"[Agent] Received manual question: {text}")
-                    # Push the message and force the agent to answer instantly
-                    session.generate_reply(user_input=text)
-            except Exception as e:
-                logger.error(f"[Agent] Error processing data packet: {e}")
+        # Log every single packet for debugging
+        logger.info(f"[Agent] Packet received! Size: {len(data_packet.data)} bytes")
+        
+        try:
+            import json
+            payload = json.loads(data_packet.data)
+            logger.info(f"[Agent] Payload: {payload}")
+            
+            if payload.get("type") == "question":
+                text = payload.get("text")
+                logger.info(f"[Agent] Intercepted UI question: {text}")
+                # Use generate_reply to force the agent to respond
+                session.generate_reply(user_input=text)
+        except Exception as e:
+            logger.error(f"[Agent] Error in data handler: {e}")
 
     await session.say(
         "Hi! I'm Vighnarth. Great to meet you — I'm looking forward to this conversation. Go ahead!",

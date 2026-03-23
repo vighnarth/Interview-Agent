@@ -140,10 +140,12 @@ if __name__ == "__main__":
     
     # 1. Start the Agent Worker in the background
     # We use subprocess to keep it simple and separate from the FastAPI event loop
-    print("🤖 Starting Agent Worker")
+    # Write logs to a file for debugging
+    log_file = open("agent.log", "w", encoding="utf-8")
+    print("🤖 Starting Agent Worker (logging to agent.log)")
     agent_process = subprocess.Popen(
         [sys.executable, "-m", "agent.main", "start"],
-        stdout=subprocess.DEVNULL, # Keep terminal clean
+        stdout=log_file,
         stderr=subprocess.STDOUT
     )
 

@@ -12,6 +12,8 @@ livekit-api>=1.0.0
 livekit-plugins-silero>=1.5.0
 livekit-plugins-cartesia>=1.5.0
 livekit-plugins-openai>=1.5.0
+edge-tts>=6.1.12
+av>=12.0.0
 
 # STT and LLM via Groq (used as OpenAI-compatible client)
 groq>=0.10.0

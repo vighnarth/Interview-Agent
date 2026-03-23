@@ -1,0 +1,17 @@
+2026-03-23 09:57:22,153 - livekit - INFO - livekit_ffi::server:139:livekit_ffi::server - initializing ffi server v0.12.44
+2026-03-23 09:57:22,154 - livekit - INFO - livekit_ffi::cabi:50:livekit_ffi::cabi - initializing ffi server v0.12.44
+2026-03-23 09:57:22,155 - asyncio - DEBUG - Using proactor: IocpProactor
+2026-03-23 09:57:22,172 - livekit.agents - INFO - starting worker
+2026-03-23 09:57:22,177 - livekit.agents - INFO - HTTP server listening on :64511
+2026-03-23 09:57:22,231 - livekit.agents - INFO - registered worker
+2026-03-23 10:05:34,766 - livekit.agents - WARNING - unexpected message type: 258
+2026-03-23 10:05:34,788 - livekit.agents - WARNING - failed to connect to livekit, retrying in 0s
+Traceback (most recent call last):
+  File "C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\site-packages\livekit\agents\worker.py", line 1053, in _connection_task
+    await self._run_ws(ws)
+  File "C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\site-packages\livekit\agents\worker.py", line 1135, in _run_ws
+    await asyncio.gather(*tasks)
+  File "C:\Users\Divya\AppData\Local\Programs\Python\Python313\Lib\site-packages\livekit\agents\worker.py", line 1107, in _recv_task
+    raise Exception("worker connection closed unexpectedly")
+Exception: worker connection closed unexpectedly
+2026-03-23 10:05:34,876 - livekit.agents - INFO - registered worker
