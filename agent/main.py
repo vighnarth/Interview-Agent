@@ -81,6 +81,20 @@ async def entrypoint(ctx: JobContext):
 
     await session.start(agent, room=ctx.room)
 
+    @ctx.room.on("data_received")
+    def on_data_received(data_packet: rtc.DataPacket):
+        if data_packet.participant.identity == "interviewer":
+            try:
+                import json
+                data = json.loads(data_packet.data)
+                if data.get("type") == "question":
+                    text = data.get("text")
+                    logger.info(f"[Agent] Received manual question: {text}")
+                    # Push the message and force the agent to answer instantly
+                    session.generate_reply(user_input=text)
+            except Exception as e:
+                logger.error(f"[Agent] Error processing data packet: {e}")
+
     await session.say(
         "Hi! I'm Vighnarth. Great to meet you — I'm looking forward to this conversation. Go ahead!",
         allow_interruptions=True,

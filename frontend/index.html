@@ -4,357 +4,146 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Live Interview | Vighnarth Nile Digital Twin</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap"
+  <title>InterviewSuite</title <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=DM+Mono:wght@300;400;500&display=swap"
     rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
-    :root {
-      --bg-color: #0f1115;
-      --surface-color: #1a1d24;
-      --surface-light: #252932;
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --danger: #ef4444;
-      --success: #10b981;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --border: #2e3340;
-    }
-
-    * {
+    *,
+    *::before,
+    *::after {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    html,
+    body,
+    #root {
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      font-family: 'Inter', sans-serif;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #1e293b;
+      /* Soft sky-to-white gradient base */
+      background: #f0f6ff;
     }
 
-    /* Navbar */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      background-color: var(--surface-color);
-      border-bottom: 1px solid var(--border);
-      height: 70px;
-    }
-
-    .logo {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .logo span {
-      color: var(--primary);
-    }
-
-    .header-controls {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.4rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--text-muted);
-    }
-
-    .status-badge.connected .status-dot {
-      background: var(--success);
-      box-shadow: 0 0 8px var(--success);
-    }
-
-    /* Main Workspace */
-    .workspace {
-      display: flex;
-      flex: 1;
-      padding: 1.5rem;
-      gap: 1.5rem;
-      height: calc(100vh - 70px);
-    }
-
-    /* Left side - Video/Avatar Area */
-    .stage {
-      flex: 2;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .video-container {
-      flex: 1;
-      background: var(--surface-color);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .avatar-display {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-      z-index: 2;
-    }
-
-    .avatar-circle {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      background: var(--surface-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      font-family: 'Outfit';
-      font-weight: 700;
-      color: var(--text-main);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      position: relative;
-      border: 4px solid var(--surface-light);
-      transition: all 0.3s ease;
-    }
-
-    /* Speaking Animation */
-    .agent-is-speaking .avatar-circle {
-      border-color: var(--primary);
-      box-shadow: 0 0 40px rgba(79, 70, 229, 0.4);
-      transform: scale(1.05);
-    }
-
-    .agent-is-speaking .waveform span {
-      animation: bounce 0.5s infinite alternate;
-    }
-
-    .agent-is-listening .waveform span {
-      animation: listen-pulse 1.5s infinite;
-    }
-
-    .waveform {
-      display: flex;
-      gap: 4px;
-      height: 30px;
-      align-items: center;
-    }
-
-    .waveform span {
+    ::-webkit-scrollbar {
       width: 4px;
-      border-radius: 2px;
-      background: var(--primary);
-      display: inline-block;
-      transition: height 0.1s;
     }
 
-    .waveform span:nth-child(1) {
-      height: 10px;
-      animation-delay: 0.1s;
-    }
-
-    .waveform span:nth-child(2) {
-      height: 20px;
-      animation-delay: 0.2s;
-    }
-
-    .waveform span:nth-child(3) {
-      height: 30px;
-      animation-delay: 0.3s;
-    }
-
-    .waveform span:nth-child(4) {
-      height: 15px;
-      animation-delay: 0.4s;
-    }
-
-    .waveform span:nth-child(5) {
-      height: 25px;
-      animation-delay: 0.5s;
-    }
-
-    @keyframes bounce {
-      0% {
-        height: 10px;
-      }
-
-      100% {
-        height: 30px;
-      }
-    }
-
-    @keyframes listen-pulse {
-
-      0%,
-      100% {
-        height: 8px;
-        opacity: 0.5;
-      }
-
-      50% {
-        height: 12px;
-        opacity: 1;
-      }
-    }
-
-    .agent-name-tag {
-      position: absolute;
-      bottom: 1.5rem;
-      left: 1.5rem;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(8px);
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .active-indicator {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--success);
-    }
-
-    .call-controls {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      padding: 1rem;
-      background: var(--surface-color);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-    }
-
-    .icon-btn {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: none;
-      cursor: pointer;
-      color: white;
-      transition: all 0.2s;
-      font-size: 1.2rem;
-    }
-
-    .btn-call {
-      background: var(--primary);
-    }
-
-    .btn-call:hover:not(:disabled) {
-      background: var(--primary-hover);
-      transform: translateY(-2px);
-    }
-
-    .btn-end {
-      background: var(--danger);
-    }
-
-    .btn-end:hover:not(:disabled) {
-      filter: brightness(1.1);
-    }
-
-    .btn-mic {
-      background: var(--surface-light);
-      border: 1px solid var(--border);
-    }
-
-    .btn-mic:hover:not(:disabled) {
-      background: #333845;
-    }
-
-    .icon-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Right side - Transcript Area */
-    .sidebar {
-      flex: 1;
-      background: var(--surface-color);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      min-width: 320px;
-    }
-
-    .sidebar-header {
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .transcript-box {
-      flex: 1;
-      padding: 1.5rem;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    /* WebKit Scrollbar styling */
-    .transcript-box::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .transcript-box::-webkit-scrollbar-track {
+    ::-webkit-scrollbar-track {
       background: transparent;
     }
 
-    .transcript-box::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 196, 255, 0.4);
+      border-radius: 4px;
     }
 
-    .message {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      animation: slideIn 0.3s ease forwards;
+    /* ── Keyframes ── */
+    @keyframes cloud-drift-1 {
+
+      0%,
+      100% {
+        transform: translate(0, 0);
+      }
+
+      50% {
+        transform: translate(35px, -18px);
+      }
     }
 
-    @keyframes slideIn {
+    @keyframes cloud-drift-2 {
+
+      0%,
+      100% {
+        transform: translate(0, 0);
+      }
+
+      50% {
+        transform: translate(-28px, 22px);
+      }
+    }
+
+    @keyframes cloud-drift-3 {
+
+      0%,
+      100% {
+        transform: translate(0, 0);
+      }
+
+      50% {
+        transform: translate(18px, 28px);
+      }
+    }
+
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: scale(1.55);
+        opacity: 0;
+      }
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.35;
+      }
+    }
+
+    @keyframes bar-speak {
+
+      0%,
+      100% {
+        transform: scaleY(0.1);
+      }
+
+      50% {
+        transform: scaleY(1);
+      }
+    }
+
+    @keyframes bar-listen {
+
+      0%,
+      100% {
+        transform: scaleY(0.12);
+      }
+
+      50% {
+        transform: scaleY(0.45);
+      }
+    }
+
+    @keyframes shimmer-name {
+      0% {
+        background-position: -200% center;
+      }
+
+      100% {
+        background-position: 200% center;
+      }
+    }
+
+    @keyframes fadeSlideUp {
       from {
         opacity: 0;
         transform: translateY(10px);
@@ -366,286 +155,985 @@
       }
     }
 
-    .message .sender {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-muted);
+    @keyframes float-avatar {
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
     }
 
-    .message .bubble {
-      padding: 0.8rem 1rem;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      line-height: 1.5;
-      max-width: 90%;
+    @keyframes toast-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px) translateX(-50%);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) translateX(-50%);
+      }
     }
 
-    .msg-agent {
-      align-items: flex-start;
+    @keyframes glow-speak {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0), 0 8px 32px rgba(59, 130, 246, 0.18);
+      }
+
+      50% {
+        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0.07), 0 8px 48px rgba(59, 130, 246, 0.32);
+      }
     }
 
-    .msg-agent .bubble {
-      background: #23223f;
-      border: 1px solid #373369;
-      border-top-left-radius: 4px;
+    @keyframes glow-listen {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0), 0 8px 32px rgba(16, 185, 129, 0.14);
+      }
+
+      50% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.06), 0 8px 48px rgba(16, 185, 129, 0.26);
+      }
     }
 
-    .msg-user {
-      align-items: flex-end;
+    .speaking-avatar {
+      animation: glow-speak 2s ease-in-out infinite;
     }
 
-    .msg-user .bubble {
-      background: var(--surface-light);
-      border: 1px solid var(--border);
-      border-top-right-radius: 4px;
+    .listening-avatar {
+      animation: glow-listen 2.4s ease-in-out infinite;
     }
 
-    .msg-system {
-      align-items: center;
-      margin: 1rem 0;
+    .bar-speaking {
+      animation: bar-speak var(--dur, 0.6s) ease-in-out infinite;
     }
 
-    .msg-system .bubble {
-      background: transparent;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-style: italic;
-      padding: 0;
-      text-align: center;
+    .bar-listening {
+      animation: bar-listen 1.9s ease-in-out infinite;
+    }
+
+    .float-el {
+      animation: float-avatar 4s ease-in-out infinite;
+    }
+
+    .msg-in {
+      animation: fadeSlideUp 0.22s ease forwards;
+    }
+
+    /* Question row hover */
+    .q-row {
+      transition: all 0.15s;
+    }
+
+    .q-row:hover {
+      background: rgba(59, 130, 246, 0.06) !important;
+      border-color: rgba(59, 130, 246, 0.22) !important;
+    }
+
+    .q-row:hover .q-ask-chip {
+      opacity: 1 !important;
     }
   </style>
 </head>
 
 <body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
 
-  <header>
-    <div class="logo">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"
-        stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-        <line x1="12" y1="19" x2="12" y2="22"></line>
-      </svg>
-      Live<span>Interview</span>
-    </div>
-    <div class="header-controls">
-      <div class="status-badge" id="statusBadge">
-        <div class="status-dot"></div>
-        <span id="headerStatusText">Offline</span>
-      </div>
-    </div>
-  </header>
+    /* ─── constants ─── */
+    const QUESTIONS = [
+      { text: "Tell me about yourself.", cat: "intro" },
+      { text: "What's your background in machine learning?", cat: "intro" },
+      { text: "Why did you choose to specialize in AI/ML?", cat: "intro" },
+      { text: "Tell me about a challenging project you've worked on.", cat: "project" },
+      { text: "What is your most technically complex project?", cat: "project" },
+      { text: "Tell me about a project that failed and what you learned.", cat: "project" },
+      { text: "Walk me through the Smart City Dashboard architecture.", cat: "project" },
+      { text: "How does your HR onboarding assistant handle edge cases?", cat: "project" },
+      { text: "When would you use RAG vs fine-tuning an LLM?", cat: "technical" },
+      { text: "What's your opinion on Python vs Go for backend services?", cat: "technical" },
+      { text: "How do you think about monolith vs microservices?", cat: "technical" },
+      { text: "Explain how you'd build a semantic search system from scratch.", cat: "technical" },
+      { text: "How would you deal with a heavily imbalanced dataset?", cat: "technical" },
+      { text: "What's your approach to debugging a production ML model?", cat: "technical" },
+      { text: "How do you ensure fault tolerance in multi-agent systems?", cat: "technical" },
+      { text: "Tell me about a time you disagreed with a technical decision.", cat: "behavioral" },
+      { text: "Describe a time you had to learn a new technology quickly.", cat: "behavioral" },
+      { text: "Tell me about a production incident you handled.", cat: "behavioral" },
+      { text: "What do you think makes a good engineering team?", cat: "behavioral" },
+      { text: "Where do you see AI/ML going in the next 3 years?", cat: "behavioral" },
+    ];
 
-  <div class="workspace">
-    <div class="stage">
-      <div class="video-container" id="videoContainer">
-        <div class="agent-name-tag">
-          <div class="active-indicator" id="agentIndicator" style="opacity: 0.5; background: var(--text-muted);"></div>
-          Vighnarth Nile (Candidate)
+    const TOPICS = ["RAG", "LangGraph", "FastAPI", "LangChain", "ChromaDB", "OSRM", "FAISS", "IEEE", "Agentic", "NLP", "Multi-Agent", "Sankey", "LLM", "Python", "Vector DB"];
+
+    /* Cool, readable category colours — work on light bg */
+    const CAT = {
+      intro: { bg: 'rgba(124,58,237,0.08)', bd: 'rgba(124,58,237,0.25)', tx: '#7c3aed', label: 'Intro' },
+      project: { bg: 'rgba(2,132,199,0.08)', bd: 'rgba(2,132,199,0.22)', tx: '#0284c7', label: 'Project' },
+      technical: { bg: 'rgba(217,119,6,0.08)', bd: 'rgba(217,119,6,0.22)', tx: '#d97706', label: 'Technical' },
+      behavioral: { bg: 'rgba(5,150,105,0.08)', bd: 'rgba(5,150,105,0.22)', tx: '#059669', label: 'Behavioral' },
+    };
+
+    const EAGER_LINES = [
+      "Really curious to hear this one…",
+      "Take your time — I'm all ears.",
+      "This tells me a lot. Go ahead!",
+      "Love this question.",
+      "I've been looking forward to this.",
+      "Tell me everything.",
+      "This is where it gets interesting!",
+    ];
+
+    const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+
+    /* ── Soft background ── */
+    function SoftBg({ agentState }) {
+      const speaking = agentState === 'speaking';
+      const listening = agentState === 'listening';
+      return (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+          {/* Base gradient */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(145deg, #f0f6ff 0%, #e8f2fc 35%, #edf8ff 65%, #f4f9ff 100%)'
+          }} />
+
+          {/* Drifting orbs */}
+          <div style={{
+            position: 'absolute', width: 700, height: 700, borderRadius: '50%',
+            top: '-18%', left: '-12%',
+            background: 'radial-gradient(circle, rgba(186,222,255,0.55) 0%, transparent 65%)',
+            animation: 'cloud-drift-1 22s ease-in-out infinite'
+          }} />
+          <div style={{
+            position: 'absolute', width: 560, height: 560, borderRadius: '50%',
+            bottom: '-12%', right: '-8%',
+            background: 'radial-gradient(circle, rgba(199,235,255,0.48) 0%, transparent 65%)',
+            animation: 'cloud-drift-2 28s ease-in-out infinite'
+          }} />
+          <div style={{
+            position: 'absolute', width: 420, height: 420, borderRadius: '50%',
+            top: '38%', left: '44%', transform: 'translate(-50%,-50%)',
+            background: speaking
+              ? 'radial-gradient(circle, rgba(147,197,253,0.42) 0%, transparent 65%)'
+              : listening
+                ? 'radial-gradient(circle, rgba(167,243,208,0.32) 0%, transparent 65%)'
+                : 'radial-gradient(circle, rgba(186,222,255,0.28) 0%, transparent 65%)',
+            transition: 'background 1.5s ease',
+            animation: 'cloud-drift-3 18s ease-in-out infinite'
+          }} />
+
+          {/* Dot grid */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: 'radial-gradient(circle, rgba(99,155,220,0.14) 1px, transparent 1px)',
+            backgroundSize: '34px 34px'
+          }} />
         </div>
+      );
+    }
 
-        <div class="avatar-display" id="avatarDisplay">
-          <div class="avatar-circle">VN</div>
-          <div class="waveform" id="waveform">
-            <span style="height: 4px;"></span><span style="height: 4px;"></span>
-            <span style="height: 4px;"></span><span style="height: 4px;"></span>
-            <span style="height: 4px;"></span>
+    /* ── Topbar ── */
+    function Topbar({ status, elapsed, micOn }) {
+      const live = status === 'live';
+      const connecting = status === 'connecting';
+      const error = status === 'error';
+
+      return (
+        <header style={{
+          position: 'relative', zIndex: 20, height: 58,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 24px',
+          background: 'rgba(255,255,255,0.82)',
+          borderBottom: '1px solid rgba(148,196,255,0.3)',
+          backdropFilter: 'blur(20px)',
+          boxShadow: '0 1px 12px rgba(99,155,220,0.1)',
+        }}>
+          {/* Brand */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+              background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 2px 10px rgba(59,130,246,0.35)',
+            }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                <line x1="12" y1="19" x2="12" y2="22" />
+              </svg>
+            </div>
+            <div>
+              <div style={{
+                fontFamily: "'Plus Jakarta Sans'", fontSize: 20, fontWeight: 700,
+                color: '#1e293b', letterSpacing: '-0.02em', lineHeight: 1.1
+              }}>
+                Interview<span style={{ color: '#3b82f6' }}>Suite</span>
+              </div>
+              <div style={{ fontSize: 11, color: '#94a3b8', lineHeight: 1, fontWeight: 400 }}>
+                Vighnarth Nile · AI/ML Engineer
+              </div>
+            </div>
           </div>
-          <p id="agentStatusText" style="color: var(--text-muted); font-size: 0.9rem;">Ready to start interview...</p>
+
+          {/* Status pill */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 7,
+            padding: '5px 14px', borderRadius: 20,
+            background: live ? 'rgba(16,185,129,0.1)' : connecting ? 'rgba(245,158,11,0.1)' : error ? 'rgba(239,68,68,0.08)' : 'rgba(148,163,184,0.1)',
+            border: live ? '1px solid rgba(16,185,129,0.3)' : connecting ? '1px solid rgba(245,158,11,0.28)' : error ? '1px solid rgba(239,68,68,0.25)' : '1px solid rgba(203,213,225,0.6)',
+          }}>
+            <div style={{
+              width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
+              background: live ? '#10b981' : connecting ? '#f59e0b' : error ? '#ef4444' : '#cbd5e1',
+              boxShadow: live ? '0 0 7px rgba(16,185,129,0.7)' : 'none',
+              animation: (live || connecting) ? 'pulse-dot 1.8s infinite' : 'none',
+            }} />
+            <span style={{
+              fontSize: 12.5, fontWeight: 600,
+              color: live ? '#065f46' : connecting ? '#92400e' : error ? '#991b1b' : '#64748b'
+            }}>
+              {live ? 'Session Live' : connecting ? 'Connecting…' : error ? 'Error' : 'Ready'}
+            </span>
+          </div>
+
+          {/* Right */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {micOn && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '4px 10px', borderRadius: 8,
+                background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.28)'
+              }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="22" />
+                </svg>
+                <span style={{ fontSize: 11.5, fontWeight: 600, color: '#059669' }}>Mic On</span>
+              </div>
+            )}
+            <div style={{
+              fontFamily: 'DM Mono', fontSize: 15, letterSpacing: '0.07em',
+              color: elapsed > 0 ? '#3b82f6' : '#cbd5e1',
+              background: elapsed > 0 ? 'rgba(59,130,246,0.08)' : 'rgba(203,213,225,0.25)',
+              border: elapsed > 0 ? '1px solid rgba(59,130,246,0.2)' : '1px solid rgba(203,213,225,0.4)',
+              padding: '4px 12px', borderRadius: 8, minWidth: 58, textAlign: 'center',
+            }}>{fmt(elapsed)}</div>
+          </div>
+        </header>
+      );
+    }
+
+    /* ── Question Bank ── */
+    function QuestionBank({ askedSet, onFire, sessionActive }) {
+      const [cat, setCat] = useState('all');
+      const [q, setQ] = useState('');
+      const cats = ['all', 'intro', 'project', 'technical', 'behavioral'];
+      const filtered = QUESTIONS.filter((x, i) =>
+        (cat === 'all' || x.cat === cat) && x.text.toLowerCase().includes(q.toLowerCase())
+      );
+
+      return (
+        <aside style={{
+          width: 284, flexShrink: 0, display: 'flex', flexDirection: 'column',
+          background: 'rgba(255,255,255,0.7)',
+          backdropFilter: 'blur(24px)',
+          borderRight: '1px solid rgba(148,196,255,0.3)',
+          zIndex: 10, overflow: 'hidden',
+        }}>
+          {/* Header */}
+          <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid rgba(148,196,255,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11 }}>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', letterSpacing: '-0.01em' }}>
+                  Questions
+                </div>
+                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 1, fontWeight: 400 }}>
+                  {sessionActive ? 'Click to ask the agent' : 'Start session to enable'}
+                </div>
+              </div>
+              <span style={{
+                fontFamily: 'DM Mono', fontSize: 11,
+                color: '#3b82f6', background: 'rgba(59,130,246,0.1)',
+                border: '1px solid rgba(59,130,246,0.22)',
+                padding: '2px 8px', borderRadius: 10,
+              }}>{askedSet.size}/{QUESTIONS.length}</span>
+            </div>
+
+            {/* Search */}
+            <div style={{ position: 'relative' }}>
+              <svg style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}
+                width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+              </svg>
+              <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search questions…"
+                style={{
+                  width: '100%', background: 'rgba(241,245,249,0.8)',
+                  border: '1px solid rgba(203,213,225,0.6)', borderRadius: 8,
+                  padding: '7px 10px 7px 30px', fontSize: 13, color: '#334155',
+                  outline: 'none', fontFamily: "'Plus Jakarta Sans'",
+                }} />
+            </div>
+          </div>
+
+          {/* Category chips */}
+          <div style={{
+            display: 'flex', gap: 4, padding: '9px 13px',
+            borderBottom: '1px solid rgba(148,196,255,0.2)', flexWrap: 'wrap'
+          }}>
+            {cats.map(c => {
+              const cc = CAT[c]; const active = cat === c;
+              return (
+                <button key={c} onClick={() => setCat(c)} style={{
+                  fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 20, cursor: 'pointer',
+                  border: active ? `1px solid ${cc?.bd || 'rgba(59,130,246,0.35)'}` : '1px solid rgba(203,213,225,0.6)',
+                  background: active ? (cc?.bg || 'rgba(59,130,246,0.1)') : 'rgba(255,255,255,0.6)',
+                  color: active ? (cc?.tx || '#3b82f6') : '#94a3b8',
+                  transition: 'all 0.15s',
+                }}>{cc?.label || 'All'}</button>
+              );
+            })}
+          </div>
+
+          {/* Hint */}
+          {!sessionActive && (
+            <div style={{
+              margin: '10px 12px 4px', padding: '9px 11px', borderRadius: 8,
+              background: 'rgba(254,243,199,0.7)', border: '1px solid rgba(251,191,36,0.35)',
+              fontSize: 12, color: '#92400e', lineHeight: 1.5
+            }}>
+              💡 Start the session, then click any question to ask it.
+            </div>
+          )}
+
+          {/* List */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '6px 8px' }}>
+            {filtered.map(x => {
+              const idx = QUESTIONS.indexOf(x);
+              const done = askedSet.has(idx);
+              const cc = CAT[x.cat];
+              return (
+                <div key={idx} className="q-row" onClick={() => onFire(idx)} style={{
+                  display: 'flex', gap: 9, padding: '9px 10px', borderRadius: 9,
+                  cursor: sessionActive ? 'pointer' : 'default',
+                  marginBottom: 2,
+                  border: done ? '1px solid rgba(16,185,129,0.3)' : '1px solid transparent',
+                  background: done ? 'rgba(16,185,129,0.06)' : 'transparent',
+                  opacity: !sessionActive && !done ? 0.45 : 1,
+                }}>
+                  {/* Status icon */}
+                  <div style={{ marginTop: 2, flexShrink: 0 }}>
+                    {done
+                      ? <div style={{
+                        width: 16, height: 16, borderRadius: '50%', background: '#10b981',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      }}>
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </div>
+                      : <div style={{
+                        width: 7, height: 7, marginTop: 4, borderRadius: '50%',
+                        background: cc.tx, opacity: 0.5
+                      }} />
+                    }
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12.5, color: done ? '#065f46' : '#475569', lineHeight: 1.45, marginBottom: 5 }}>
+                      {x.text}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{
+                        fontSize: 10.5, fontWeight: 600, padding: '2px 7px', borderRadius: 4,
+                        background: cc.bg, color: cc.tx, border: `1px solid ${cc.bd}`
+                      }}>
+                        {cc.label}
+                      </span>
+                      {sessionActive && !done && (
+                        <span className="q-ask-chip" style={{
+                          opacity: 0, transition: 'opacity 0.15s', fontSize: 10.5, fontWeight: 600,
+                          padding: '2px 7px', borderRadius: 4,
+                          background: 'rgba(59,130,246,0.1)', color: '#2563eb',
+                          border: '1px solid rgba(59,130,246,0.25)', cursor: 'pointer',
+                        }}>Ask →</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </aside>
+      );
+    }
+
+    /* ── Center Stage ── */
+    function Stage({ agentState, stateLabel, eagerLine, onStart, onEnd, active }) {
+      const speaking = agentState === 'speaking';
+      const listening = agentState === 'listening';
+      const bars = [0.3, 0.65, 1, 0.5, 0.88, 0.42, 0.76, 0.34, 0.6, 0.28, 0.52, 0.38];
+
+      return (
+        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+          {/* Content area */}
+          <div style={{
+            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            position: 'relative', zIndex: 1, padding: '0 32px'
+          }}>
+            <div className={active ? 'float-el' : ''}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+
+              {/* Avatar */}
+              <div style={{ position: 'relative', marginBottom: 26 }}>
+                {(speaking || listening) && <>
+                  <div style={{
+                    position: 'absolute', inset: -18, borderRadius: '50%',
+                    border: `1.5px solid ${speaking ? 'rgba(59,130,246,0.35)' : 'rgba(16,185,129,0.3)'}`,
+                    animation: 'pulse-ring 2.2s ease-out infinite'
+                  }} />
+                  <div style={{
+                    position: 'absolute', inset: -8, borderRadius: '50%',
+                    border: `1.5px solid ${speaking ? 'rgba(59,130,246,0.2)' : 'rgba(16,185,129,0.18)'}`,
+                    animation: 'pulse-ring 2.2s ease-out infinite 0.6s'
+                  }} />
+                </>}
+
+                <div className={speaking ? 'speaking-avatar' : listening ? 'listening-avatar' : ''}
+                  style={{
+                    width: 158, height: 158, borderRadius: '50%',
+                    background: speaking
+                      ? 'linear-gradient(145deg, #dbeafe, #bfdbfe)'
+                      : listening
+                        ? 'linear-gradient(145deg, #d1fae5, #a7f3d0)'
+                        : 'linear-gradient(145deg, #e0f2fe, #bae6fd)',
+                    border: speaking ? '2.5px solid rgba(59,130,246,0.5)'
+                      : listening ? '2.5px solid rgba(16,185,129,0.45)'
+                        : '2.5px solid rgba(148,196,255,0.45)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    position: 'relative', overflow: 'hidden',
+                    transition: 'all 0.65s ease',
+                  }}>
+                  {/* Inner ring detail */}
+                  <div style={{
+                    position: 'absolute', inset: 8, borderRadius: '50%',
+                    border: speaking ? '1px solid rgba(59,130,246,0.2)'
+                      : listening ? '1px solid rgba(16,185,129,0.18)'
+                        : '1px solid rgba(148,196,255,0.25)'
+                  }} />
+                  <span style={{
+                    fontSize: 50, fontWeight: 700, position: 'relative', zIndex: 1,
+                    fontFamily: "'Plus Jakarta Sans'", letterSpacing: '-0.03em',
+                    color: speaking ? '#1d4ed8' : listening ? '#047857' : '#3b82f6',
+                    transition: 'color 0.6s',
+                  }}>VN</span>
+                </div>
+              </div>
+
+              {/* Name — big and proud */}
+              <div style={{
+                fontFamily: "'Plus Jakarta Sans'", fontSize: 56, fontWeight: 800,
+                letterSpacing: '-0.035em', lineHeight: 1, textAlign: 'center',
+                marginBottom: 10,
+                color: speaking ? '#1d4ed8' : listening ? '#047857' : '#1e293b',
+                transition: 'color 0.4s',
+              }}>
+                Vighnarth Nile
+              </div>
+
+              {/* Role row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 22, flexWrap: 'wrap', justifyContent: 'center' }}>
+                {['AI / ML Engineer', 'VESIT \'26', 'Mumbai'].map((t, i) => (
+                  <span key={i} style={{
+                    fontSize: 12, fontWeight: 500, padding: '4px 12px', borderRadius: 20,
+                    background: 'rgba(255,255,255,0.75)', border: '1px solid rgba(148,196,255,0.4)',
+                    color: '#4a7aa8',
+                  }}>{t}</span>
+                ))}
+              </div>
+
+              {/* Waveform */}
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3.5, height: 36, marginBottom: 18 }}>
+                {bars.map((_, i) => (
+                  <div key={i}
+                    className={speaking ? 'bar-speaking' : listening ? 'bar-listening' : ''}
+                    style={{
+                      width: 3.5, height: 36, borderRadius: 4,
+                      background: speaking
+                        ? `rgba(59,130,246,${0.35 + (i % 3) * 0.2})`
+                        : listening
+                          ? `rgba(16,185,129,${0.3 + (i % 3) * 0.18})`
+                          : 'rgba(148,196,255,0.3)',
+                      transformOrigin: 'bottom', transform: 'scaleY(0.1)',
+                      '--dur': `${0.33 + i * 0.058}s`, animationDelay: `${i * 0.062}s`,
+                      transition: 'background 0.5s',
+                    }} />
+                ))}
+              </div>
+
+              {/* State pill */}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                padding: '7px 18px', borderRadius: 24,
+                background: speaking ? 'rgba(219,234,254,0.9)'
+                  : listening ? 'rgba(209,250,229,0.9)'
+                    : 'rgba(255,255,255,0.7)',
+                border: speaking ? '1px solid rgba(59,130,246,0.4)'
+                  : listening ? '1px solid rgba(16,185,129,0.38)'
+                    : '1px solid rgba(148,196,255,0.4)',
+                boxShadow: speaking ? '0 2px 14px rgba(59,130,246,0.14)'
+                  : listening ? '0 2px 14px rgba(16,185,129,0.12)'
+                    : '0 2px 10px rgba(148,196,255,0.15)',
+                transition: 'all 0.5s',
+                minWidth: 160, justifyContent: 'center',
+              }}>
+                {(speaking || listening) && (
+                  <div style={{
+                    width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
+                    background: speaking ? '#3b82f6' : '#10b981',
+                    animation: 'pulse-dot 1.6s infinite',
+                    boxShadow: speaking ? '0 0 8px rgba(59,130,246,0.8)' : '0 0 8px rgba(16,185,129,0.8)',
+                  }} />
+                )}
+                <span style={{
+                  fontSize: 13, fontWeight: 600,
+                  color: speaking ? '#1d4ed8' : listening ? '#047857' : '#7aa3c8'
+                }}>
+                  {stateLabel || 'Ready to begin'}
+                </span>
+              </div>
+
+              {/* Eager line */}
+              {eagerLine && (
+                <div key={eagerLine} style={{
+                  marginTop: 14, fontSize: 15, fontStyle: 'italic', fontWeight: 300,
+                  color: '#7aa3c8', textAlign: 'center', lineHeight: 1.5,
+                  maxWidth: 300, animation: 'fadeSlideUp 0.4s ease',
+                  fontFamily: "'Plus Jakarta Sans'",
+                }}>
+                  "{eagerLine}"
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom controls */}
+          <div style={{
+            padding: '14px 32px 18px',
+            background: 'rgba(255,255,255,0.65)',
+            borderTop: '1px solid rgba(148,196,255,0.25)',
+            backdropFilter: 'blur(20px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+            flexShrink: 0, zIndex: 2,
+          }}>
+            {!active ? (
+              <button onClick={onStart} style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '11px 34px', borderRadius: 12, border: 'none',
+                fontFamily: "'Plus Jakarta Sans'", fontSize: 14, fontWeight: 700,
+                color: '#fff', cursor: 'pointer',
+                background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 60%, #0ea5e9 100%)',
+                boxShadow: '0 4px 20px rgba(37,99,235,0.35)',
+                transition: 'all 0.2s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(37,99,235,0.45)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(37,99,235,0.35)'; }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.21 12 19.79 19.79 0 0 1 1.14 3.4 2 2 0 0 1 3.11 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+                Start Interview
+              </button>
+            ) : (
+              <button onClick={onEnd} style={{
+                display: 'flex', alignItems: 'center', gap: 9,
+                padding: '11px 26px', borderRadius: 12,
+                fontFamily: "'Plus Jakarta Sans'", fontSize: 14, fontWeight: 600,
+                color: '#dc2626', background: 'rgba(254,226,226,0.8)',
+                border: '1.5px solid rgba(220,38,38,0.28)', cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <line x1="23" y1="1" x2="1" y2="23" />
+                  <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07" />
+                </svg>
+                End Session
+              </button>
+            )}
+          </div>
+        </main>
+      );
+    }
+
+    /* ── Right panel — tabbed ── */
+    function RightPanel({ elapsed, askedCount, exchanges, mentioned, messages }) {
+      const [tab, setTab] = useState('transcript');
+      const [notes, setNotes] = useState('');
+      const scrollRef = useRef(null);
+
+      useEffect(() => {
+        if (tab === 'transcript' && scrollRef.current)
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }, [messages, tab]);
+
+      const TABS = [
+        { id: 'transcript', label: 'Transcript' },
+        { id: 'topics', label: 'Topics' },
+        { id: 'notes', label: 'Notes' },
+      ];
+
+      return (
+        <aside style={{
+          width: 296, flexShrink: 0, display: 'flex', flexDirection: 'column',
+          background: 'rgba(255,255,255,0.7)',
+          backdropFilter: 'blur(24px)',
+          borderLeft: '1px solid rgba(148,196,255,0.3)',
+          zIndex: 10,
+        }}>
+          {/* Stats */}
+          <div style={{
+            display: 'grid', gridTemplateColumns: '1fr 1fr',
+            borderBottom: '1px solid rgba(148,196,255,0.2)'
+          }}>
+            {[
+              { label: 'Duration', value: fmt(elapsed), color: '#3b82f6' },
+              { label: 'Questions', value: askedCount, color: '#7c3aed' },
+              { label: 'Exchanges', value: exchanges, color: '#0d9488' },
+              { label: 'Topics', value: mentioned.size, color: '#d97706' },
+            ].map((s, i) => (
+              <div key={s.label} style={{
+                padding: '12px 14px',
+                borderRight: i % 2 === 0 ? '1px solid rgba(148,196,255,0.2)' : 'none',
+                borderBottom: i < 2 ? '1px solid rgba(148,196,255,0.2)' : 'none',
+                background: 'rgba(255,255,255,0.5)',
+              }}>
+                <div style={{
+                  fontSize: 10, fontWeight: 700, color: '#94a3b8', letterSpacing: '0.07em',
+                  textTransform: 'uppercase', marginBottom: 3
+                }}>{s.label}</div>
+                <div style={{ fontFamily: 'DM Mono', fontSize: 22, color: s.color, lineHeight: 1 }}>{s.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Tabs */}
+          <div style={{ display: 'flex', borderBottom: '1px solid rgba(148,196,255,0.2)', padding: '0 10px' }}>
+            {TABS.map(t => (
+              <button key={t.id} onClick={() => setTab(t.id)} style={{
+                flex: 1, padding: '10px 0', fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+                background: 'transparent', border: 'none',
+                color: tab === t.id ? '#2563eb' : '#94a3b8',
+                borderBottom: tab === t.id ? '2.5px solid #3b82f6' : '2.5px solid transparent',
+                transition: 'all 0.15s',
+              }}>{t.label}</button>
+            ))}
+          </div>
+
+          {/* Tab content */}
+          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+
+            {/* Transcript */}
+            {tab === 'transcript' && (
+              <div ref={scrollRef} style={{
+                flex: 1, overflowY: 'auto', padding: '10px 12px',
+                display: 'flex', flexDirection: 'column', gap: 10
+              }}>
+                {messages.map((m, i) => (
+                  <div key={i} className="msg-in">
+                    {m.type === 'sys' ? (
+                      <div style={{
+                        fontSize: 11.5, color: '#94a3b8', fontStyle: 'italic',
+                        textAlign: 'center', padding: '2px 0'
+                      }}>{m.text}</div>
+                    ) : (
+                      <div>
+                        <div style={{
+                          fontSize: 10.5, fontWeight: 700, marginBottom: 4,
+                          textTransform: 'uppercase', letterSpacing: '0.05em',
+                          color: m.type === 'agent' ? '#2563eb' : '#059669'
+                        }}>
+                          {m.type === 'agent' ? 'Vighnarth' : 'Interviewer'}
+                        </div>
+                        <div style={{
+                          fontSize: 13, color: '#334155', lineHeight: 1.55,
+                          padding: '9px 11px', borderRadius: 9,
+                          background: m.type === 'agent' ? 'rgba(219,234,254,0.75)' : 'rgba(209,250,229,0.7)',
+                          border: m.type === 'agent' ? '1px solid rgba(59,130,246,0.22)' : '1px solid rgba(16,185,129,0.22)',
+                        }}>{m.text}</div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Topics */}
+            {tab === 'topics' && (
+              <div style={{ flex: 1, overflowY: 'auto', padding: '14px 14px' }}>
+                <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 14, lineHeight: 1.55 }}>
+                  Topics light up when mentioned in conversation.
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 18 }}>
+                  {TOPICS.map(t => {
+                    const hit = mentioned.has(t.toLowerCase());
+                    return (
+                      <span key={t} style={{
+                        fontSize: 12.5, fontWeight: hit ? 600 : 400,
+                        padding: '4px 11px', borderRadius: 8,
+                        transition: 'all 0.4s ease',
+                        background: hit ? 'rgba(219,234,254,0.9)' : 'rgba(241,245,249,0.8)',
+                        color: hit ? '#1d4ed8' : '#94a3b8',
+                        border: hit ? '1px solid rgba(59,130,246,0.35)' : '1px solid rgba(203,213,225,0.6)',
+                        boxShadow: hit ? '0 2px 10px rgba(59,130,246,0.12)' : 'none',
+                      }}>
+                        {hit && <span style={{ marginRight: 4, fontSize: 10 }}>✦</span>}{t}
+                      </span>
+                    );
+                  })}
+                </div>
+                {/* Progress bar */}
+                <div style={{
+                  padding: '12px 14px', borderRadius: 12,
+                  background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(148,196,255,0.3)',
+                  boxShadow: '0 2px 12px rgba(99,155,220,0.08)'
+                }}>
+                  <div style={{ fontFamily: 'DM Mono', fontSize: 24, color: '#2563eb', lineHeight: 1 }}>
+                    {mentioned.size}
+                    <span style={{
+                      fontSize: 13, color: '#94a3b8', fontFamily: "'Plus Jakarta Sans'",
+                      fontWeight: 400, marginLeft: 8
+                    }}>/ {TOPICS.length} covered</span>
+                  </div>
+                  <div style={{ marginTop: 10, height: 5, borderRadius: 5, background: 'rgba(148,196,255,0.2)' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 5,
+                      background: 'linear-gradient(90deg,#3b82f6,#0ea5e9)',
+                      width: `${TOPICS.length ? (mentioned.size / TOPICS.length) * 100 : 0}%`,
+                      transition: 'width 0.5s ease',
+                    }} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Notes */}
+            {tab === 'notes' && (
+              <div style={{ flex: 1, padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <p style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>
+                  Private notes — visible only to you.
+                </p>
+                <textarea value={notes} onChange={e => setNotes(e.target.value)}
+                  placeholder="Jot observations, highlights, red flags…"
+                  style={{
+                    flex: 1, resize: 'none', outline: 'none',
+                    background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(148,196,255,0.35)',
+                    borderRadius: 10, padding: '11px 12px',
+                    fontSize: 13, color: '#1e293b', lineHeight: 1.6,
+                    fontFamily: "'Plus Jakarta Sans'",
+                    boxShadow: 'inset 0 1px 4px rgba(99,155,220,0.06)',
+                  }} />
+                {notes && (
+                  <span style={{ fontSize: 11, color: '#94a3b8', fontFamily: 'DM Mono' }}>
+                    {notes.split(/\s+/).filter(Boolean).length} words
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </aside>
+      );
+    }
+
+    /* ── Topic tags (sidebar) ── */
+    function TopicTags({ mentioned }) {
+      return (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+          {TOPICS.map(t => {
+            const hit = mentioned.has(t.toLowerCase());
+            return (
+              <span key={t} style={{
+                fontSize: 11, fontWeight: hit ? 600 : 400, padding: '3px 8px', borderRadius: 5,
+                transition: 'all 0.4s',
+                background: hit ? 'rgba(219,234,254,0.9)' : 'rgba(241,245,249,0.8)',
+                color: hit ? '#1d4ed8' : '#94a3b8',
+                border: hit ? '1px solid rgba(59,130,246,0.32)' : '1px solid rgba(203,213,225,0.5)',
+              }}>{t}</span>
+            );
+          })}
         </div>
-      </div>
+      );
+    }
 
-      <div class="call-controls">
-        <button class="icon-btn btn-call" id="btnStart" onclick="startInterview()" title="Start Interview">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path
-              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-            </path>
-          </svg>
-        </button>
-        <button class="icon-btn btn-mic" id="btnMic" disabled title="Microphone Active">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-            <line x1="12" y1="19" x2="12" y2="22"></line>
-          </svg>
-        </button>
-        <button class="icon-btn btn-end" id="btnEnd" onclick="endInterview()" disabled title="Leave Interview">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path
-              d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91">
-            </path>
-            <line x1="23" y1="1" x2="1" y2="23"></line>
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <div class="sidebar">
-      <div class="sidebar-header">
-        Live Transcript
-      </div>
-      <div class="transcript-box" id="transcript">
-        <div class="message msg-system">
-          <div class="bubble">Click the phone icon to join the interview room. Note: You must allow microphone
-            permissions.</div>
+    /* ── Toast ── */
+    function Toast({ msg }) {
+      return msg ? (
+        <div style={{
+          position: 'fixed', bottom: 22, left: '50%',
+          animation: 'toast-in 0.2s ease forwards',
+          background: 'rgba(255,255,255,0.95)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(59,130,246,0.28)', borderRadius: 10,
+          padding: '10px 18px', fontSize: 13, fontWeight: 500, color: '#1e293b',
+          zIndex: 9999,
+          boxShadow: '0 8px 28px rgba(99,155,220,0.22)',
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#3b82f6', flexShrink: 0 }} />
+          {msg}
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- LiveKit Client SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
-
-  <script>
-    let room = null;
-
-    function updateGlobalStatus(text, isConnected) {
-      document.getElementById("headerStatusText").textContent = text;
-      const badge = document.getElementById("statusBadge");
-      if (isConnected) badge.classList.add("connected");
-      else badge.classList.remove("connected");
+      ) : null;
     }
 
-    function updateAgentState(state, desc) {
-      const container = document.getElementById("videoContainer");
-      const statusTxt = document.getElementById("agentStatusText");
-      const indicator = document.getElementById("agentIndicator");
+    /* ── App ── */
+    function App() {
+      const [status, setStatus] = useState('offline');
+      const [agentState, setAgentState] = useState(null);
+      const [stateLabel, setStateLabel] = useState('');
+      const [eagerLine, setEagerLine] = useState('');
+      const [elapsed, setElapsed] = useState(0);
+      const [micOn, setMicOn] = useState(false);
+      const [active, setActive] = useState(false);
+      const [askedSet, setAskedSet] = useState(new Set());
+      const [exchanges, setExchanges] = useState(0);
+      const [mentioned, setMentioned] = useState(new Set());
+      const [messages, setMessages] = useState([{ type: 'sys', text: 'Click "Start Interview" to begin the session.' }]);
+      const [toast, setToast] = useState('');
 
-      container.classList.remove("agent-is-speaking", "agent-is-listening");
-      indicator.style.background = "var(--text-muted)";
-      indicator.style.opacity = "0.5";
+      const roomRef = useRef(null);
+      const timerRef = useRef(null);
+      const toastT = useRef(null);
+      const eagerT = useRef(null);
 
-      statusTxt.textContent = desc;
+      const showToast = useCallback(msg => {
+        setToast(msg); clearTimeout(toastT.current);
+        toastT.current = setTimeout(() => setToast(''), 2800);
+      }, []);
 
-      if (state === "speaking") {
-        container.classList.add("agent-is-speaking");
-        indicator.style.background = "var(--primary)";
-        indicator.style.opacity = "1";
-      } else if (state === "listening") {
-        container.classList.add("agent-is-listening");
-        indicator.style.background = "var(--success)";
-        indicator.style.opacity = "1";
-      }
-    }
-
-    function appendMessage(sender, text) {
-      const box = document.getElementById("transcript");
-      const msgObj = document.createElement("div");
-
-      if (sender === "system") {
-        msgObj.className = "message msg-system";
-        msgObj.innerHTML = `<div class="bubble">${text}</div>`;
-      } else if (sender === "agent") {
-        msgObj.className = "message msg-agent";
-        msgObj.innerHTML = `<span class="sender">Vighnarth Nile</span><div class="bubble">${text}</div>`;
-      } else {
-        msgObj.className = "message msg-user";
-        msgObj.innerHTML = `<span class="sender">You (Interviewer)</span><div class="bubble">${text}</div>`;
-      }
-
-      box.appendChild(msgObj);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    async function startInterview() {
-      const btnStart = document.getElementById("btnStart");
-      const btnEnd = document.getElementById("btnEnd");
-      const btnMic = document.getElementById("btnMic");
-
-      btnStart.disabled = true;
-      updateGlobalStatus("Connecting to Room...", false);
-      updateAgentState("connecting", "Establishing secure connection...");
-
-      try {
-        appendMessage("system", "Authenticating...");
-        const res = await fetch("/token?room=interview-room&identity=interviewer");
-        if (!res.ok) throw new Error("Failed to get token from server.");
-        const { token, url } = await res.json();
-
-        appendMessage("system", "Connecting to LiveKit backend...");
-        room = new LivekitClient.Room({ adaptiveStream: true, dynacast: true });
-
-        room.on(LivekitClient.RoomEvent.TrackSubscribed, (track, pub, participant) => {
-          if (track.kind === "audio" && participant.identity !== "interviewer") {
-            const audioEl = track.attach();
-            document.body.appendChild(audioEl);
-
-            updateAgentState("speaking", "Divya is speaking...");
-
-            track.on("ended", () => {
-              updateAgentState("listening", "Listening to you...");
-            });
-          }
-        });
-
-        room.on(LivekitClient.RoomEvent.DataReceived, (payload) => {
-          try {
-            const data = JSON.parse(new TextDecoder().decode(payload));
-            if (data.type === "transcript") {
-              appendMessage(data.speaker === "agent" ? "agent" : "user", data.text);
-            }
-          } catch (_) { }
-        });
-
-        room.on(LivekitClient.RoomEvent.ParticipantConnected, (p) => {
-          if (p.identity !== "interviewer") {
-            updateAgentState("listening", "Listening to your audio...");
-            appendMessage("system", "Candidate has joined the room.");
-          }
-        });
-
-        room.on(LivekitClient.RoomEvent.Disconnected, () => {
-          endInterview(true);
-        });
-
-        await room.connect(url, token);
-        updateGlobalStatus("Connected", true);
-
-        // CRITICAL: Request microphone permissions and publish audio track!
-        appendMessage("system", "Initializing your microphone...");
-        try {
-          await room.localParticipant.setMicrophoneEnabled(true);
-          btnMic.disabled = false;
-        } catch (micErr) {
-          appendMessage("system", "Warning: Microphone access denied or no mic found. The agent will not hear you.");
-          console.error("Mic error:", micErr);
+      const addMsg = useCallback((type, text) => {
+        setMessages(p => [...p, { type, text }]);
+        if (type === 'agent' || type === 'user') {
+          setExchanges(e => e + 1);
+          const lo = text.toLowerCase();
+          setMentioned(p => {
+            const n = new Set(p);
+            TOPICS.forEach(t => { if (lo.includes(t.toLowerCase())) n.add(t.toLowerCase()); });
+            return n;
+          });
         }
+      }, []);
 
-        // Dispatch agent worker
-        updateAgentState("connecting", "Pinging Agent Worker...");
-        await fetch("/dispatch?room=interview-room", { method: "POST" });
+      const triggerEager = useCallback(() => {
+        const line = EAGER_LINES[Math.floor(Math.random() * EAGER_LINES.length)];
+        setEagerLine(line);
+        clearTimeout(eagerT.current);
+        eagerT.current = setTimeout(() => setEagerLine(''), 4200);
+      }, []);
 
-        btnEnd.disabled = false;
-        appendMessage("system", "Interview session is live.");
-        updateAgentState("listening", "Waiting for agent greeting...");
+      /* ── KEY: publish question over data channel so agent hears it ── */
+      const fireQ = useCallback(async idx => {
+        if (!active) { showToast('Start the session first'); return; }
+        const q = QUESTIONS[idx];
+        setAskedSet(p => { const n = new Set(p); n.add(idx); return n; });
+        addMsg('user', q.text);
+        if (roomRef.current) {
+          try {
+            const enc = new TextEncoder().encode(JSON.stringify({ type: 'question', text: q.text }));
+            await roomRef.current.localParticipant.publishData(enc, { reliable: true });
+          } catch (e) { console.warn('publish failed', e); }
+        }
+        showToast(`Asked: "${q.text.slice(0, 46)}…"`);
+      }, [active, addMsg, showToast]);
 
-      } catch (err) {
-        console.error(err);
-        updateGlobalStatus("Connection Failed", false);
-        updateAgentState("offline", "System Failure");
-        appendMessage("system", "Error: " + err.message);
-        btnStart.disabled = false;
-      }
+      const startInterview = async () => {
+        setStatus('connecting'); setStateLabel('Connecting…');
+        try {
+          addMsg('sys', 'Joining interview room…');
+          const res = await fetch('/token?room=interview-room&identity=interviewer');
+          if (!res.ok) throw new Error('Token fetch failed.');
+          const { token, url } = await res.json();
+
+          const room = new LivekitClient.Room({ adaptiveStream: true, dynacast: true });
+          roomRef.current = room;
+
+          room.on(LivekitClient.RoomEvent.TrackSubscribed, (track, pub, participant) => {
+            if (track.kind === 'audio' && participant.identity !== 'interviewer') {
+              document.body.appendChild(track.attach());
+              setAgentState('speaking'); setStateLabel('Answering…'); setEagerLine('');
+              track.on('ended', () => { setAgentState('listening'); setStateLabel('Listening…'); triggerEager(); });
+            }
+          });
+          room.on(LivekitClient.RoomEvent.DataReceived, (payload) => {
+            try {
+              const d = JSON.parse(new TextDecoder().decode(payload));
+              if (d.type === 'transcript') addMsg(d.speaker === 'agent' ? 'agent' : 'user', d.text);
+            } catch (_) { }
+          });
+          room.on(LivekitClient.RoomEvent.ParticipantConnected, p => {
+            if (p.identity !== 'interviewer') {
+              setAgentState('listening'); setStateLabel('Listening…');
+              addMsg('sys', 'Agent is online.'); triggerEager();
+            }
+          });
+          room.on(LivekitClient.RoomEvent.Disconnected, () => endInterview(true));
+
+          await room.connect(url, token);
+          setStatus('live'); setActive(true);
+          timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000);
+
+          try {
+            await room.localParticipant.setMicrophoneEnabled(true);
+            setMicOn(true);
+          } catch (e) { addMsg('sys', 'Mic unavailable — voice input disabled.'); }
+
+          await fetch('/dispatch?room=interview-room', { method: 'POST' });
+          addMsg('sys', 'Session live — speak or click any question to begin.');
+          setAgentState('listening'); setStateLabel('Listening…');
+          triggerEager(); showToast('Interview session started');
+        } catch (err) {
+          setStatus('error'); setStateLabel('');
+          addMsg('sys', 'Error: ' + err.message); showToast('Connection failed');
+        }
+      };
+
+      const endInterview = async (fromEvent = false) => {
+        if (roomRef.current) { await roomRef.current.disconnect(); roomRef.current = null; }
+        clearInterval(timerRef.current);
+        setStatus('offline'); setAgentState(null); setStateLabel(''); setEagerLine('');
+        setMicOn(false); setActive(false);
+        if (!fromEvent) addMsg('sys', 'Session ended.');
+        showToast('Session ended');
+      };
+
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', position: 'relative' }}>
+          <SoftBg agentState={agentState} />
+          <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <Topbar status={status} elapsed={elapsed} micOn={micOn} />
+            <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+              <QuestionBank askedSet={askedSet} onFire={fireQ} sessionActive={active} />
+              <Stage
+                agentState={agentState} stateLabel={stateLabel} eagerLine={eagerLine}
+                active={active} onStart={startInterview} onEnd={endInterview}
+              />
+              <RightPanel
+                elapsed={elapsed} askedCount={askedSet.size}
+                exchanges={exchanges} mentioned={mentioned} messages={messages}
+              />
+            </div>
+          </div>
+          <Toast msg={toast} />
+        </div>
+      );
     }
 
-    async function endInterview(fromEvent = false) {
-      if (room) {
-        await room.disconnect();
-        room = null;
-      }
-      updateGlobalStatus("Offline", false);
-      updateAgentState("offline", "Interview Concluded.");
-      document.getElementById("btnStart").disabled = false;
-      document.getElementById("btnEnd").disabled = true;
-      document.getElementById("btnMic").disabled = true;
-      if (!fromEvent) {
-        appendMessage("system", "You disconnected from the interview.");
-      }
-    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
 </body>
 
